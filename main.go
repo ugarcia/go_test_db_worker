@@ -22,6 +22,6 @@ func main() {
 
     // Blocked loop by queries channel, will consume them when available
     for {
-        go queue.HandleDbQueueMessage(<-db.Worker.Ch)
+        go queue.HandleQueueMessage(<-db.Worker.Ch)
     }
 }

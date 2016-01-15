@@ -40,7 +40,7 @@ func (game Game) Delete() Game {
     return game
 }
 
-func (games Games) HandleQueueMessage(msg models.DbQueueMessage) (error, interface{}) {
+func (games Games) HandleMessage(msg models.BaseMessage) (error, interface{}) {
     var err error
     var out interface{}
     switch msg.Action {

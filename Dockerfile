@@ -34,9 +34,7 @@ ENV GO_TEST_DB_WORKER_PATH=/go/src/github.com/ugarcia/go_test_db_worker
 
 RUN mkdir -p $GO_TEST_DB_WORKER_PATH
 WORKDIR $GO_TEST_DB_WORKER_PATH
-COPY . ./
-RUN cd $GO_TEST_DB_WORKER_PATH
-RUN go get
 
-EXPOSE 8081
+EXPOSE 8601
+CMD ["go", "get"]
 CMD ["go", "run", "main.go"]
