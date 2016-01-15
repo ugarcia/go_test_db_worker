@@ -26,7 +26,7 @@ func (w *DbWorker) Init() {
     var err error
 
     // Connect to DB
-    w.Db, err = gorm.Open("mysql", "root:@tcp(127.0.0.1:3306)/gw_core?timeout=10m&parseTime=true")
+    w.Db, err = gorm.Open("mysql", "root:@tcp(db.gamewheel.local:3306)/gw_core?timeout=10m&parseTime=true")
     if  err != nil {
         log.Fatal(err.Error())
         os.Exit(1)
