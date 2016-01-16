@@ -36,5 +36,4 @@ RUN mkdir -p $GO_TEST_DB_WORKER_PATH
 WORKDIR $GO_TEST_DB_WORKER_PATH
 
 EXPOSE 8601
-CMD ["go", "get"]
-CMD ["go", "run", "main.go"]
+CMD ["sh", "-c", "go get; go run main.go"]
