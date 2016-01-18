@@ -2,38 +2,28 @@
 #
 # VERSION 0.0.1
 
-FROM ubuntu_14.04_w_git:latest
+FROM golang:latest
 
 MAINTAINER Unai Garcia <unai@gamewheel.com>
 LABEL version="0.0.1" description="Go DB Worker App which connects to DB and communicates thru rabbitmq"
 
-# gcc for cgo
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		curl \
-	&& rm -rf /var/lib/apt/lists/*
+# Copy git ssh key
+ENV HOME /root
+RUN mkdir -p $HOME/.ssh
+ADD id_rsa $HOME/.ssh/id_rsa
+RUN chmod 700 $HOME/.ssh/id_rsa && \
+          echo "Host github.com\n\tStrictHostKeyChecking no\n" >> $HOME/.ssh/config && \
+          git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
-ENV GOLANG_VERSION 1.5.3
-ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 43afe0c5017e502630b1aea4d44b8a7f059bf60d7f29dfd58db454d4e4e0ae53
+# Create app folder, copy source and set as working dir
+RUN mkdir -p /go/src/app
+COPY . /go/src/app
+WORKDIR /go/src/app
 
-RUN curl -fsSLk "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
-	&& echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
-	&& tar -C /usr/local -xzf golang.tar.gz \
-	&& rm golang.tar.gz
+# Get dependencies and compile App
+RUN go-wrapper download && \
+          go-wrapper install
 
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-
-ENV GO_TEST_DB_WORKER_PATH=/go/src/github.com/ugarcia/go_test_db_worker
-
-RUN mkdir -p $GO_TEST_DB_WORKER_PATH
-WORKDIR $GO_TEST_DB_WORKER_PATH
-
+# Expose ports and commands
 EXPOSE 8601
-CMD ["sh", "-c", "go get; go run main.go"]
+CMD ["go-wrapper", "run"]
